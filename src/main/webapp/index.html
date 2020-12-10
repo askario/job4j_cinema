@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Job4j Cinema</title>
+</head>
+<body>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script>
+    const TIMEOUT_PERIOD = 30000;
+    var store = [];
+
+    const freeProps = {
+        color: '#93D690',
+        disabled: ''
+    };
+
+    const occupiedProps = {
+        color: '#DC797F',
+        disabled: 'disabled'
+    };
+
+    const wrapTh = (value) => {
+        return '<th>' + value + '</th>';
+    };
+
+    const wrapTr = (value) => {
+        return '<tr>' + value + '</tr>';
+    };
+
+    const placeName = (place) => {
+        return 'Ряд ' +  place.row + ',' + ' Место ' + place.position;
+    };
+
+    const input = (disabled, place) => {
+        return `<input id=${generateId(place)} type="radio" name="place" value="11" ${disabled}>`;
+    };
+
+    const generateId = (place) => {
+       return 'place-' + place.id;
+    };
+
+    const freePlace = (place) => {
+        return `<td bgcolor=${freeProps.color}>` + input(freeProps.disabled, place) + placeName(place) + '</td>';
+    };
+
+    const occupiedPlace = (place) => {
+        return `<td bgcolor=${occupiedProps.color}>` + input(occupiedProps.disabled, place) + placeName(place) + '</td>';
+    };
+
+    const disablePlace = (place) => {
+        const uiComponent = place.occupied ? occupiedPlace(place) : freePlace(place);
+
+        store.push({
+            ui: uiComponent,
+            data: place,
+            selector: generateId(place)
+        });
+
+        return uiComponent;
+    };
+
+    const renderRow = (row, index) => {
+        const rowNum = wrapTh(index + 1);
+        return wrapTr(rowNum + row.map(place => disablePlace(place)));
+    };
+
+    const renderTable = (data) => {
+            $('tbody').after(data.places.map((row, index) => renderRow(row, index)).join(''));
+    };
+
+    const onClickBtn = () => {
+        const inputElement = $('input[name=place]:checked');
+
+        if(inputElement.length < 1)
+            return;
+
+        const checkedId = inputElement[0].id;
+        const checkedData = store.filter(item => item.selector === checkedId)[0].data;
+
+        if(checkedData) {
+                    const params = `id=${checkedData.id}&row=${checkedData.row}&position=${checkedData.position}&cost=${checkedData.cost}`;
+                    const redirectUrl = "http://localhost:9080/cinema/payment.html?" + params;
+                    window.location.href = redirectUrl
+        }
+    };
+
+    $(document).ready(() => {
+                $.ajax({
+                type: 'GET',
+                url: 'http://localhost:9080/cinema/hall',
+                contentType: 'application/json',
+                dataType: 'json'
+            }).done((res) => renderTable(res))
+              .fail((err) => console.log(err));
+
+    setTimeout(() => {
+            window.location.reload(1);
+        },TIMEOUT_PERIOD);
+    });
+
+
+</script>
+<div class="container">
+    <div class="row pt-3">
+        <h4>
+            Бронирование месте на сеанс
+        </h4>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th style="width: 120px;">Ряд / Место</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="row float-right">
+        <button type="button" class="btn btn-success" onclick="onClickBtn()">Оплатить</button>
+    </div>
+</div>
+</body>
+</html>
