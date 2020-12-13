@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Log4j2
 public class PsqlStore implements Store {
@@ -67,7 +68,7 @@ public class PsqlStore implements Store {
                     List<List<Place>> parsedPlaces = objectMapper.convertValue(objectMapper.readValue(places, List.class), new TypeReference<List<List<Place>>>() {
                     });
 
-                    hall = new Hall(it.getInt("id"), it.getString("name"), parsedPlaces);
+                    hall = new Hall(it.getInt("id"), it.getString("name"), parsedPlaces, it.getInt("version"));
                 }
             }
         } catch (Exception e) {
@@ -79,16 +80,24 @@ public class PsqlStore implements Store {
     @Override
     public void updateHall(Hall hall) {
         ObjectMapper objectMapper = new ObjectMapper();
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("UPDATE hall SET name = ?, places = ? WHERE id = ?");
-        ) {
-            ps.setString(1, hall.getName());
-            ps.setString(2, objectMapper.writeValueAsString(hall.getPlaces()));
-            ps.setInt(3, hall.getId());
-            ps.execute();
-        } catch (Exception e) {
-            log.error("Error while updating hall: ", e);
-        }
+        Optional<Hall> hallOpt = getLastHall();
+        hallOpt.ifPresent(actualHall -> {
+            if (actualHall.getVersion() != hall.getVersion())
+                return;
+
+            AtomicInteger version = new AtomicInteger(hall.getVersion());
+            try (Connection cn = pool.getConnection();
+                 PreparedStatement ps = cn.prepareStatement("UPDATE hall SET name = ?, places = ?, version = ? WHERE id = ?");
+            ) {
+                ps.setString(1, hall.getName());
+                ps.setString(2, objectMapper.writeValueAsString(hall.getPlaces()));
+                ps.setInt(3, version.incrementAndGet());
+                ps.setInt(4, hall.getId());
+                ps.execute();
+            } catch (Exception e) {
+                log.error("Error while updating hall: ", e);
+            }
+        });
     }
 
     @Override

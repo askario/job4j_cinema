@@ -11,4 +11,5 @@ public class Hall {
     private int id;
     private String name;
     private List<List<Place>> places;
+    private int version;
 }

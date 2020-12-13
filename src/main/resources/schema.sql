@@ -1,10 +1,11 @@
-CREATE TABLE IF NOT EXISTS hall (
+create TABLE IF NOT EXISTS hall (
    id SERIAL PRIMARY KEY,
    name TEXT,
-   places TEXT
+   places TEXT,
+   version integer
 );
 
-CREATE TABLE IF NOT EXISTS account (
+create TABLE IF NOT EXISTS account (
    id SERIAL PRIMARY KEY,
    name varchar(255),
    phone varchar(255)
