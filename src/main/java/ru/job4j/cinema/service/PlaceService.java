@@ -29,7 +29,7 @@ public class PlaceService {
 
             flattened(hall.getPlaces())
                     .stream()
-                    .filter(place -> place.getId() == bookingRequest.getId())
+                    .filter(place -> place.getId() == bookingRequest.getId() && !place.isOccupied())
                     .findFirst()
                     .ifPresent(place -> {
                         place.setOccupied(true);

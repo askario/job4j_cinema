@@ -1,4 +1,4 @@
-INSERT INTO hall (name,places)
+INSERT INTO hall (name,places,version)
 VALUES ('Default Hall',
     REPLACE('[[{"id":1,"row":1,"position":1,"hall_id":1,"cost":300,"account_id":0,"occupied":false},
          {"id":2,"row":1,"position":2,"hall_id":1,"cost":200,"account_id":0,"occupied":false},
@@ -10,4 +10,4 @@ VALUES ('Default Hall',
         ],
         [{"id":7,"row":3,"position":1,"hall_id":1,"cost":700,"account_id":0,"occupied":false},
          {"id":8,"row":3,"position":2,"hall_id":1,"cost":700,"account_id":0,"occupied":false},
-         {"id":9,"row":3,"position":3,"hall_id":1,"cost":700,"account_id":0,"occupied":false}]]',' ',''))
+         {"id":9,"row":3,"position":3,"hall_id":1,"cost":700,"account_id":0,"occupied":false}]]',' ',''),1);
