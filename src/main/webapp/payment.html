@@ -37,7 +37,7 @@
     };
 
     const createTitle = (params) => {
-        return `Вы выбрали ряд ${params.row} место ${params.position}, Сумма : ${params.cost} рублей.`;
+        return `Вы выбрали ряд ${params.row} место ${params.place}, Сумма : ${params.price} рублей.`;
     };
 
     const validate = () => {
@@ -66,10 +66,11 @@
     const sendBookingRequest = (account) => {
         return new Promise((resolve,reject) => {
             global_data.account = account
+            console.log('global_data',global_data);
             $.ajax({
                 type: 'POST',
                 crossdomain: true,
-                url: 'http://localhost:9080/cinema/hall',
+                url: 'http://localhost:9080/cinema/seat',
                 data: JSON.stringify(global_data),
                 contentType: 'application/json',
                 dataType: 'json'

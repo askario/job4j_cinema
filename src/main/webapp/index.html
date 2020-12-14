@@ -23,6 +23,7 @@
 <script>
     const TIMEOUT_PERIOD = 30000;
     var store = [];
+    var global_data;
 
     const freeProps = {
         color: '#93D690',
@@ -42,33 +43,33 @@
         return '<tr>' + value + '</tr>';
     };
 
-    const placeName = (place) => {
-        return 'Ряд ' +  place.row + ',' + ' Место ' + place.position;
+    const seatName = (seat) => {
+        return 'Ряд ' +  seat.row + ',' + ' Место ' + seat.place;
     };
 
-    const input = (disabled, place) => {
-        return `<input id=${generateId(place)} type="radio" name="place" value="11" ${disabled}>`;
+    const input = (disabled, seat) => {
+        return `<input id=${generateId(seat)} type="radio" name="seat" value="11" ${disabled}>`;
     };
 
-    const generateId = (place) => {
-       return 'place-' + place.id;
+    const generateId = (seat) => {
+       return 'seat-' + seat.id;
     };
 
-    const freePlace = (place) => {
-        return `<td bgcolor=${freeProps.color}>` + input(freeProps.disabled, place) + placeName(place) + '</td>';
+    const freeSeat = (seat) => {
+        return `<td bgcolor=${freeProps.color}>` + input(freeProps.disabled, seat) + seatName(seat) + '</td>';
     };
 
-    const occupiedPlace = (place) => {
-        return `<td bgcolor=${occupiedProps.color}>` + input(occupiedProps.disabled, place) + placeName(place) + '</td>';
+    const occupiedSeat = (seat) => {
+        return `<td bgcolor=${occupiedProps.color}>` + input(occupiedProps.disabled, seat) + seatName(seat) + '</td>';
     };
 
-    const disablePlace = (place) => {
-        const uiComponent = place.occupied ? occupiedPlace(place) : freePlace(place);
+    const disableSeat = (seat) => {
+        const uiComponent = seat.occupied ? occupiedSeat(seat) : freeSeat(seat);
 
         store.push({
             ui: uiComponent,
-            data: place,
-            selector: generateId(place)
+            data: seat,
+            selector: generateId(seat)
         });
 
         return uiComponent;
@@ -76,15 +77,16 @@
 
     const renderRow = (row, index) => {
         const rowNum = wrapTh(index + 1);
-        return wrapTr(rowNum + row.map(place => disablePlace(place)));
+        return wrapTr(rowNum + row.map(seat => disableSeat(seat)));
     };
 
     const renderTable = (data) => {
-            $('tbody').after(data.places.map((row, index) => renderRow(row, index)).join(''));
+            global_data = data;
+            $('tbody').after(Object.values(data.sessionState.seats).map((row, index) => renderRow(row, index)).join(''));
     };
 
     const onClickBtn = () => {
-        const inputElement = $('input[name=place]:checked');
+        const inputElement = $('input[name=seat]:checked');
 
         if(inputElement.length < 1)
             return;
@@ -93,17 +95,23 @@
         const checkedData = store.filter(item => item.selector === checkedId)[0].data;
 
         if(checkedData) {
-                    const params = `id=${checkedData.id}&row=${checkedData.row}&position=${checkedData.position}&cost=${checkedData.cost}`;
+                    const params = `session=${global_data.sessionState.session.id}&hall=${global_data.sessionState.session.hallId}&id=${checkedData.id}&row=${checkedData.row}&place=${checkedData.place}&price=${checkedData.price}`;
                     const redirectUrl = "http://localhost:9080/cinema/payment.html?" + params;
                     window.location.href = redirectUrl
         }
     };
 
     $(document).ready(() => {
+                const sessionRequest = {
+                    id: 1
+                };
+
                 $.ajax({
-                type: 'GET',
-                url: 'http://localhost:9080/cinema/hall',
+                type: 'POST',
+                url: 'http://localhost:9080/cinema/session',
+                crossdomain: true,
                 contentType: 'application/json',
+                data: JSON.stringify(sessionRequest),
                 dataType: 'json'
             }).done((res) => renderTable(res))
               .fail((err) => console.log(err));
@@ -112,6 +120,8 @@
             window.location.reload(1);
         },TIMEOUT_PERIOD);
     });
+
+
 
 
 </script>

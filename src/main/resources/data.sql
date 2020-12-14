@@ -1,13 +1,10 @@
-INSERT INTO hall (name,places,version)
-VALUES ('Default Hall',
-    REPLACE('[[{"id":1,"row":1,"position":1,"hall_id":1,"cost":300,"account_id":0,"occupied":false},
-         {"id":2,"row":1,"position":2,"hall_id":1,"cost":200,"account_id":0,"occupied":false},
-         {"id":3,"row":1,"position":3,"hall_id":1,"cost":300,"account_id":0,"occupied":false}
-        ],
-        [{"id":4,"row":2,"position":1,"hall_id":1,"cost":500,"account_id":0,"occupied":false},
-         {"id":5,"row":2,"position":2,"hall_id":1,"cost":500,"account_id":0,"occupied":false},
-         {"id":6,"row":2,"position":3,"hall_id":1,"cost":500,"account_id":0,"occupied":false}
-        ],
-        [{"id":7,"row":3,"position":1,"hall_id":1,"cost":700,"account_id":0,"occupied":false},
-         {"id":8,"row":3,"position":2,"hall_id":1,"cost":700,"account_id":0,"occupied":false},
-         {"id":9,"row":3,"position":3,"hall_id":1,"cost":700,"account_id":0,"occupied":false}]]',' ',''),1);
+insert into halls (id,name) values
+    (1,'Большой зал');
+
+insert into sessions (id, name, hall_id) values
+    (1,'Вечерний сеанс',1);
+
+insert into seats (row,place,hall_id) values
+    (1,1,1),(1,2,1),(1,3,1),
+    (2,1,1),(2,2,1),(2,3,1),
+    (3,1,1),(3,2,1),(3,3,1);

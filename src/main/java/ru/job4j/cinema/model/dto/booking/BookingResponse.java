@@ -1,4 +1,4 @@
-package ru.job4j.cinema.model.dto;
+package ru.job4j.cinema.model.dto.booking;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

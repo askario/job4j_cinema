@@ -1,4 +1,4 @@
-package ru.job4j.cinema.model.dto;
+package ru.job4j.cinema.model.dto.booking;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +9,11 @@ import ru.job4j.cinema.model.Account;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingRequest {
+    private int session;
+    private int hall;
     private int id;
     private int row;
-    private int position;
-    private int cost;
+    private int place;
+    private int price;
     private Account account;
 }
